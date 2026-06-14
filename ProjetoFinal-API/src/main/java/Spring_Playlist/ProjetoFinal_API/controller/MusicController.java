@@ -4,6 +4,7 @@ import Spring_Playlist.ProjetoFinal_API.dtos.MusicRequestDTO;
 import Spring_Playlist.ProjetoFinal_API.dtos.MusicResponseDTO;
 import Spring_Playlist.ProjetoFinal_API.service.MusicService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,9 +14,11 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/musics")
+@RequiredArgsConstructor
 public class MusicController {
-    @Autowired
-    private MusicService musicService;
+
+    private final MusicService musicService;
+
     @PostMapping
     public ResponseEntity<MusicResponseDTO> salvar(@RequestBody @Valid MusicRequestDTO dto) {
         return ResponseEntity.status(201).body(musicService.salvar(dto));

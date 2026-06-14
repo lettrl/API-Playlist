@@ -1,41 +1,33 @@
 package Spring_Playlist.ProjetoFinal_API.model;
 import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
 @Table(name = "musics")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Music {
 
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Long id;
 
+        @Column(length = 255, nullable = false)
         private String title;
 
+        @Column(length = 255, nullable = false)
         private String artist;
 
+        @Column(length = 255)
         private String genre;
 
+        @Column(nullable = false)
         private Integer duration;
 
         @ManyToOne
         @JoinColumn(name = "playlist_id")
         private Playlist playlist;
 
-        public Long getId(){return id;}
-        public void setId(Long id) {this.id = id;}
-
-        public String getTitle(){return title;}
-        public void setTitle(String title) {this.title = title;}
-
-        public String getArtist(){return artist;}
-        public void setArtist(String artist) {this.artist = artist;}
-
-        public String getGenre(){return genre;}
-        public void setGenre(String genre){this.genre = genre;}
-
-        public Integer getDuration(){return duration;}
-        public void setDuration(Integer duration) {this.duration = duration; }
-
-        public Playlist getPlaylist(){return playlist;}
-        public void setPlaylist(Playlist playlist){this.playlist = playlist; }
 }

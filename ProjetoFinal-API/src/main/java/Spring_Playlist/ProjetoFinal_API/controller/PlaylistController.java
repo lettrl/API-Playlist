@@ -4,6 +4,7 @@ import Spring_Playlist.ProjetoFinal_API.dtos.PlaylistRequestDTO;
 import Spring_Playlist.ProjetoFinal_API.dtos.PlaylistResponseDTO;
 import Spring_Playlist.ProjetoFinal_API.service.PlaylistService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,10 +14,10 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/playlists")
+@RequiredArgsConstructor
 public class PlaylistController {
 
-    @Autowired
-    private PlaylistService playlistService;
+    private final PlaylistService playlistService;
 
     @GetMapping
     public ResponseEntity<Page<PlaylistResponseDTO>> listarTodas(@PageableDefault(size = 10) Pageable pageable) {

@@ -3,46 +3,44 @@ package Spring_Playlist.ProjetoFinal_API.service;
 import Spring_Playlist.ProjetoFinal_API.dtos.MusicRequestDTO;
 import Spring_Playlist.ProjetoFinal_API.dtos.MusicResponseDTO;
 import Spring_Playlist.ProjetoFinal_API.exception.ResourceNotFoundException;
+import Spring_Playlist.ProjetoFinal_API.mapper.MusicMapper;
 import Spring_Playlist.ProjetoFinal_API.model.Music;
 import Spring_Playlist.ProjetoFinal_API.model.Playlist;
 import Spring_Playlist.ProjetoFinal_API.repository.MusicRepository;
 import Spring_Playlist.ProjetoFinal_API.repository.PlaylistRepository;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class MusicService {
 
-    @Autowired
-    private MusicRepository musicRepository;
-
-    @Autowired
-    private PlaylistRepository playlistRepository;
-
-    @Autowired
-    private ModelMapper modelMapper;
+    private final MusicRepository musicRepository;
+    private final PlaylistRepository playlistRepository;
+    private final MusicMapper musicMapper;
 
     public MusicResponseDTO salvar(MusicRequestDTO dto) {
         Playlist playlist = playlistRepository.findById(dto.playlistId())
                 .orElseThrow(() -> new ResourceNotFoundException("Playlist não encontrada com o ID: " + dto.playlistId()));
-        Music music = modelMapper.map(dto, Music.class);
+        Music music = musicMapper.toEntity(dto);
         music.setId(null);
         music.setPlaylist(playlist);
-        Music musicSalva = musicRepository.save(music);
-        return new MusicResponseDTO(musicSalva.getId(), musicSalva.getTitle(), musicSalva.getArtist(), musicSalva.getGenre(), musicSalva.getDuration(), playlist.getId());
+        Music newMusic = musicRepository.save(music);
+        return musicMapper.toResponse(newMusic);
     }
+
     public Page<MusicResponseDTO> listarTodas(Pageable pageable) {
-        return musicRepository.findAll(pageable)
-                .map(m -> new MusicResponseDTO(m.getId(), m.getTitle(), m.getArtist(), m.getGenre(), m.getDuration(), m.getPlaylist().getId()));
+        return musicRepository.findAll(pageable).map(m -> musicMapper.toResponse(m));
     }
+
     public MusicResponseDTO buscarPorId(Long id) {
         Music music = musicRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Música não encontrada com o ID: " + id));
-        return new MusicResponseDTO(music.getId(), music.getTitle(), music.getArtist(), music.getGenre(), music.getDuration(), music.getPlaylist().getId());
+        return musicMapper.toResponse(music);
     }
+
     public MusicResponseDTO atualizar(Long id, MusicRequestDTO dto) {
         Music music = musicRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Música não encontrada com o ID: " + id));
@@ -55,9 +53,10 @@ public class MusicService {
         music.setDuration(dto.duration());
         music.setPlaylist(playlist);
 
-        Music musicAtualizada = musicRepository.save(music);
-        return new MusicResponseDTO(musicAtualizada.getId(), musicAtualizada.getTitle(), musicAtualizada.getArtist(), musicAtualizada.getGenre(), musicAtualizada.getDuration(), playlist.getId());
+        Music updateMusic = musicRepository.save(music);
+        return musicMapper.toResponse(updateMusic);
     }
+
     public void deletar(Long id) {
         Music music = musicRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Música não encontrada com o ID: " + id));
